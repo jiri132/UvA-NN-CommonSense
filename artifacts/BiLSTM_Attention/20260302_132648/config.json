@@ -1,0 +1,9 @@
+{
+  "model_name": "BiLSTM_Attention",
+  "seed": 42,
+  "max_len": 25,
+  "batch_size": 32,
+  "lr": 5e-05,
+  "epochs": 6,
+  "torch_version": "2.10.0+cpu"
+}

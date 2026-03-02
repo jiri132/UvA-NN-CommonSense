@@ -1,0 +1,17 @@
+{
+  "epoch_metrics": [
+    Val Accuracy: 0.7424
+Epoch 8/13 | Loss: 0.4661
+Val Accuracy: 0.7441
+Epoch 9/13 | Loss: 0.4528
+Val Accuracy: 0.7429
+Epoch 10/13 | Loss: 0.4397
+Val Accuracy: 0.7445
+Epoch 11/13 | Loss: 0.4262
+Val Accuracy: 0.7441
+Epoch 12/13 | Loss: 0.4129
+Val Accuracy: 0.7395
+Epoch 13/13 | Loss: 0.3997
+Val Accuracy: 0.7431
+]
+}

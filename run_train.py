@@ -1,6 +1,6 @@
 from src.config import *
+from src.models import *
 from src.data import TextDataset, build_vocab
-from src.models import EmbeddingMeanClassifier, EmbeddingAttentionClassifier, BiLSTMAttentionClassifier
 from src.train import train_model
 from src.utils import set_seed, save_experiment
 import pandas as pd
@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch
+import os
 
 config = {
     "model_name": MODEL_NAME,
@@ -36,13 +37,10 @@ val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 # Initialize model, criterion, optimizer
 print("Initializing model, criterion, and optimizer...")
-model = BiLSTMAttentionClassifier(len(vocab), EMBED_DIM).to(DEVICE)
+model = BiLSTMAttentionClassifier(len(vocab), EMBED_DIM, hidden_dim=64).to(DEVICE)
 criterion = nn.BCEWithLogitsLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=LR)
+optimizer = torch.optim.AdamW(model.parameters(), lr=LR,weight_decay=1e-5)
 
-# Train
-print("Training on the dataset...")
-train_model(model, train_loader, val_loader, criterion, optimizer, DEVICE, EPOCHS)
 
 # Save checkpoint
 entry_dir = save_experiment(
@@ -54,15 +52,6 @@ entry_dir = save_experiment(
     config=config
 )
 
-training_log_path = os.path.join(entry_dir, "training_log.json")
-with open(training_log_path, "r") as f:
-    log = json.load(f)
-
-log["epoch_metrics"].append({
-    "epoch": 1,
-    "loss": 0.4567,
-    "val_accuracy": 0.7135
-})
-
-with open(training_log_path, "w") as f:
-    json.dump(log, f, indent=2)
+# Train
+print("Training on the dataset...")
+train_model(model, train_loader, val_loader, criterion, optimizer, DEVICE, EPOCHS)

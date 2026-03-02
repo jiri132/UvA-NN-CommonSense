@@ -1,6 +1,7 @@
 import torch
 
-def train_model(model, train_loader, val_loader, criterion, optimizer, device, epochs):
+def train_model(model, train_loader, val_loader, criterion, optimizer, device, epochs,threads = 4):
+    torch.set_num_threads(threads) 
     for epoch in range(epochs):
         model.train()
         total_loss = 0

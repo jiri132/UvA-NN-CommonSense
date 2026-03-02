@@ -1,0 +1,12 @@
+Epoch 1/6 | Loss: 0.5860
+Val Accuracy: 0.7349
+Epoch 2/6 | Loss: 0.5151
+Val Accuracy: 0.7402
+Epoch 3/6 | Loss: 0.4809
+Val Accuracy: 0.7512
+Epoch 4/6 | Loss: 0.4482
+Val Accuracy: 0.7479
+Epoch 5/6 | Loss: 0.4170
+Val Accuracy: 0.7395
+Epoch 6/6 | Loss: 0.3869
+Val Accuracy: 0.7410
