@@ -3,6 +3,8 @@ from src.models import *
 from src.data import TextDataset, build_vocab
 from src.train import train_model
 from src.utils import set_seed, save_experiment
+from src.metrics import compute_class_distribution
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
@@ -27,6 +29,10 @@ df = pd.read_csv(DATA_PATH)
 train_texts, val_texts, train_labels, val_labels = train_test_split(
     df["input_text"], df["label"], test_size=0.2, random_state=SEED, stratify=df["label"]
 )
+
+print("Training class distribution:", compute_class_distribution(train_labels.values))
+print("Validation class distribution:", compute_class_distribution(val_labels.values))
+
 vocab = build_vocab(train_texts)
 
 train_dataset = TextDataset(train_texts, train_labels, vocab, MAX_LEN)
