@@ -84,3 +84,34 @@ class BiLSTMAttentionClassifier(nn.Module):
         pooled = self.attention(lstm_out, mask)
         logits = self.classifier(pooled)
         return logits.squeeze(1)
+    
+class GRUAttentionClassifier(nn.Module):
+    def __init__(self, vocab_size, embed_dim=100, hidden_dim=64):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        
+        self.gru = nn.GRU(
+            input_size=embed_dim,
+            hidden_size=hidden_dim,
+            num_layers=2,
+            dropout=0.4,
+            batch_first=True,
+            bidirectional=False 
+        )
+        
+        self.attention = AttentionPooling(hidden_dim) 
+        
+        self.classifier = nn.Sequential(
+            nn.Linear(hidden_dim, 128), 
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, 1)
+        )
+
+    def forward(self, x):
+        mask = x != 0
+        embeds = self.embedding(x)
+        gru_out, _ = self.gru(embeds)
+        pooled = self.attention(gru_out, mask)
+        logits = self.classifier(pooled)
+        return logits.squeeze(1)
