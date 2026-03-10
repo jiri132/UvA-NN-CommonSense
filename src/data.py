@@ -1,7 +1,7 @@
 import pandas as pd
 from collections import Counter
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, WeightedRandomSampler
 
 def tokenizer(text: str):
     return text.lower().split()
@@ -21,6 +21,17 @@ def encode(text, vocab):
 def pad_sequence(seq, max_len):
     seq = seq[:max_len]
     return seq + [0] * (max_len - len(seq))
+
+def make_weighted_sampler(labels):
+    class_count = torch.bincount(torch.tensor(labels))
+    class_weights = 1.0 / class_count.float()
+    sample_weights = class_weights[torch.tensor(labels)]
+    sampler = WeightedRandomSampler(
+        weights=sample_weights,
+        num_samples=len(sample_weights),
+        replacement=True
+    )
+    return sampler
 
 class TextDataset(Dataset):
     def __init__(self, texts, labels, vocab, max_len):
