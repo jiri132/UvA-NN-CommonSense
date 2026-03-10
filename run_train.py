@@ -1,6 +1,6 @@
 from src.config import *
 from src.models import *
-from src.data import TextDataset, build_vocab
+from src.data import TextDataset, build_vocab, make_weighted_sampler
 from src.train import train_model
 from src.utils import set_seed, save_experiment
 from src.metrics import compute_class_distribution
@@ -17,6 +17,8 @@ config = {
     "seed": SEED,
     "max_len": MAX_LEN,
     "batch_size": BATCH_SIZE,
+    "hidden_dim": HIDDEN_DIM,
+    "embed_dim": EMBED_DIM,
     "lr": LR,
     "epochs": EPOCHS
 }
@@ -37,16 +39,21 @@ vocab = build_vocab(train_texts)
 
 train_dataset = TextDataset(train_texts, train_labels, vocab, MAX_LEN)
 val_dataset = TextDataset(val_texts, val_labels, vocab, MAX_LEN)
+sampler = make_weighted_sampler(train_labels.values)
 
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, sampler=sampler)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 # Initialize model, criterion, optimizer
 print("Initializing model, criterion, and optimizer...")
-model = BiLSTMAttentionClassifier(len(vocab), EMBED_DIM, hidden_dim=64).to(DEVICE)
+model = EmbeddingAttentionClassifier(len(vocab), EMBED_DIM).to(DEVICE)
+# model = (len(vocab), EMBED_DIM, hidden_dim=HIDDEN_DIM).to(DEVICE)
 criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=LR,weight_decay=1e-5)
 
+# Train
+print("Training on the dataset...")
+train_model(model, train_loader, val_loader, criterion, optimizer, DEVICE, EPOCHS)
 
 # Save checkpoint
 entry_dir = save_experiment(
@@ -57,7 +64,3 @@ entry_dir = save_experiment(
     max_len=MAX_LEN,
     config=config
 )
-
-# Train
-print("Training on the dataset...")
-train_model(model, train_loader, val_loader, criterion, optimizer, DEVICE, EPOCHS)
